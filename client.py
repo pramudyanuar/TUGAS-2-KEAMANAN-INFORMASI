@@ -1,27 +1,51 @@
 import socket
 import threading
+from tkinter import *
+from tkinter import scrolledtext, messagebox
 from des import encryption_large_text, decryption_large_text
 
-# Variabel untuk menyimpan shared key
+# Variabel untuk menyimpan shared key dan username
 shared_key = None
+username = None
 
-def send_message(client_socket):
+def connect_to_server():
+    global client_socket, username
+
+    username = username_entry.get()
+    if not username:
+        messagebox.showerror("Error", "Username cannot be empty!")
+        return
+
+    try:
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect(('127.0.0.1', 12345))
+
+        # Kirim username ke server
+        client_socket.sendall(f"USERNAME:{username}".encode('utf-8'))
+
+        # Masuk ke tampilan chat setelah login berhasil
+        login_frame.pack_forget()
+        chat_frame.pack(fill=BOTH, expand=True)
+
+        # Mulai thread untuk menerima pesan dari server
+        threading.Thread(target=receive_message).start()
+    except Exception as e:
+        messagebox.showerror("Error", f"Could not connect to server: {e}")
+
+def send_message():
     global shared_key
-    while True:
-        try:
-            # Tunggu hingga shared_key diterima
-            if shared_key is None:
-                continue
-            
-            inp = input("")
-            message = encryption_large_text(inp, shared_key)
-            client_socket.sendall(message.encode('utf-8'))
-        except Exception as e:
-            print(f"Error: {e}")
-            client_socket.close()
-            break
+    if shared_key is None:
+        chat_display.insert(END, "Waiting for shared key...\n")
+        return
+    
+    message = message_entry.get()
+    if message:
+        encrypted_message = encryption_large_text(message, shared_key)
+        client_socket.sendall(encrypted_message.encode('utf-8'))
+        chat_display.insert(END, f"You: {message}\n")
+        message_entry.delete(0, END)
 
-def receive_message(client_socket):
+def receive_message():
     global shared_key
     while True:
         try:
@@ -30,36 +54,58 @@ def receive_message(client_socket):
                 if "Your shared key:" in receive:
                     # Mengambil shared key dari pesan server
                     shared_key = receive.split(": ")[1].strip()
-                    print(f"Received shared key: {shared_key}")
+                    chat_display.insert(END, f"Received shared key: {shared_key}\n")
                 else:
                     # Memisahkan username dan pesan terenkripsi
                     if ": " in receive:
                         sender, encrypted_message = receive.split(": ", 1)
                         message = decryption_large_text(encrypted_message, shared_key)
-                        print(f"{sender}: {message}")
+                        chat_display.insert(END, f"{sender}: {message}\n")
                     else:
-                        print("Format pesan tidak dikenal:", receive)
+                        chat_display.insert(END, f"Unknown message format: {receive}\n")
             else:
                 break
         except Exception as e:
-            print(f"Error receiving message: {e}")
+            chat_display.insert(END, f"Error receiving message: {e}\n")
             break
 
+def on_closing():
+    client_socket.close()
+    root.destroy()
 
-def client_program():
-    username = input("Enter your username: ")  # Minta username dari pengguna
+# Inisialisasi GUI
+root = Tk()
+root.title("Chat App")
+root.geometry("400x500")
 
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(('127.0.0.1', 12345))
+# Frame untuk login
+login_frame = Frame(root)
+login_frame.pack(fill=BOTH, expand=True)
 
-    # Kirim username ke server
-    client_socket.sendall(f"USERNAME:{username}".encode('utf-8'))
+Label(login_frame, text="Enter your username:", font=("Arial", 12)).pack(pady=10)
+username_entry = Entry(login_frame, font=("Arial", 12))
+username_entry.pack(pady=10)
 
-    # Mulai thread untuk menerima pesan dari server
-    threading.Thread(target=receive_message, args=(client_socket,)).start()
-    # Mulai thread untuk mengirim pesan ke server
-    threading.Thread(target=send_message, args=(client_socket,)).start()
+login_button = Button(login_frame, text="Login", command=connect_to_server)
+login_button.pack(pady=5)
 
-# Menjalankan client
-if __name__ == "__main__":
-    client_program()
+# Frame untuk chat
+chat_frame = Frame(root)
+
+chat_display = scrolledtext.ScrolledText(chat_frame, wrap=WORD, font=("Arial", 12))
+chat_display.pack(padx=10, pady=10, fill=BOTH, expand=True)
+chat_display.config(state=NORMAL)
+
+message_frame = Frame(chat_frame)
+message_frame.pack(fill=X, padx=10, pady=5)
+
+message_entry = Entry(message_frame, font=("Arial", 12))
+message_entry.pack(side=LEFT, fill=X, expand=True, padx=(0, 5))
+message_entry.bind("<Return>", lambda event: send_message())
+
+send_button = Button(message_frame, text="Send", command=send_message)
+send_button.pack(side=RIGHT)
+
+# Tutup koneksi saat aplikasi ditutup
+root.protocol("WM_DELETE_WINDOW", on_closing)
+root.mainloop()
