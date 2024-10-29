@@ -1,28 +1,5 @@
-PC1 = [
-    57, 49, 41, 33, 25, 17, 9,
-    1, 58, 50, 42, 34, 26, 18,
-    10, 2, 59, 51, 43, 35, 27,
-    19, 11, 3, 60, 52, 44, 36,
-    63, 55, 47, 39, 31, 23, 15,
-    7, 62, 54, 46, 38, 30, 22,
-    14, 6, 61, 53, 45, 37, 29,
-    21, 13, 5, 28, 20, 12, 4
-]
-
-PC2 = [
-    14, 17, 11, 24, 1, 5,
-    3, 28, 15, 6, 21, 10,
-    23, 19, 12, 4, 26, 8,
-    16, 7, 27, 20, 13, 2,
-    41, 52, 31, 37, 47, 55,
-    30, 40, 51, 45, 33, 48,
-    44, 49, 39, 56, 34, 53,
-    46, 42, 50, 36, 29, 32
-]
-
-ROTATIONS = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
-
-INITIAL_PERMUTATION = [
+#initail permutation
+ip_table = [
     58, 50, 42, 34, 26, 18, 10, 2,
     60, 52, 44, 36, 28, 20, 12, 4,
     62, 54, 46, 38, 30, 22, 14, 6,
@@ -32,19 +9,33 @@ INITIAL_PERMUTATION = [
     61, 53, 45, 37, 29, 21, 13, 5,
     63, 55, 47, 39, 31, 23, 15, 7
 ]
-
-FINAL_PERMUTATION = [
-    40, 8, 48, 16, 56, 24, 64, 32,
-    39, 7, 47, 15, 55, 23, 63, 31,
-    38, 6, 46, 14, 54, 22, 62, 30,
-    37, 5, 45, 13, 53, 21, 61, 29,
-    36, 4, 44, 12, 52, 20, 60, 28,
-    35, 3, 43, 11, 51, 19, 59, 27,
-    34, 2, 42, 10, 50, 18, 58, 26,
-    33, 1, 41, 9, 49, 17, 57, 25
+# PC1 permutation table
+pc1_table = [
+    57, 49, 41, 33, 25, 17, 9, 1,
+    58, 50, 42, 34, 26, 18, 10, 2,
+    59, 51, 43, 35, 27, 19, 11, 3,
+    60, 52, 44, 36, 63, 55, 47, 39,
+    31, 23, 15, 7, 62, 54, 46, 38,
+    30, 22, 14, 6, 61, 53, 45, 37,
+    29, 21, 13, 5, 28, 20, 12, 4
 ]
+# Define the left shift schedule for each round
+shift_schedule = [1, 1, 2, 2,
+                  2, 2, 2, 2,
+                  1, 2, 2, 2,
+                  2, 2, 2, 1]
 
-EXPANSION_TABLE = [
+# PC2 permutation table
+pc2_table = [
+    14, 17, 11, 24, 1, 5, 3, 28,
+    15, 6, 21, 10, 23, 19, 12, 4,
+    26, 8, 16, 7, 27, 20, 13, 2,
+    41, 52, 31, 37, 47, 55, 30, 40,
+    51, 45, 33, 48, 44, 49, 39, 56,
+    34, 53, 46, 42, 50, 36, 29, 32
+]
+#expension
+e_box_table = [
     32, 1, 2, 3, 4, 5,
     4, 5, 6, 7, 8, 9,
     8, 9, 10, 11, 12, 13,
@@ -55,234 +46,358 @@ EXPANSION_TABLE = [
     28, 29, 30, 31, 32, 1
 ]
 
-P_BOX = [
-    16, 7, 20, 21,
-    29, 12, 28, 17,
-    1, 15, 23, 26,
-    5, 18, 31, 10,
-    2, 8, 24, 14,
-    32, 27, 3, 9,
-    19, 13, 30, 6,
-    22, 11, 4, 25
+# S-box tables for DES
+s_boxes = [
+    # S-box 1
+    [
+        [14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7],
+        [0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8],
+        [4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0],
+        [15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13]
+    ],
+    # S-box 2
+    [
+        [15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10],
+        [3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5],
+        [0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15],
+        [13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9]
+    ],
+    # S-box 3
+    [
+        [10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8],
+        [13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1],
+        [13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7],
+        [1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12]
+    ],
+    # S-box 4
+    [
+        [7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15],
+        [13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9],
+        [10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4],
+        [3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14]
+    ],
+    # S-box 5
+    [
+        [2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9],
+        [14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6],
+        [4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14],
+        [11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3]
+    ],
+    # S-box 6
+    [
+        [12, 1, 10, 15, 9, 2, 6, 8, 0, 13, 3, 4, 14, 7, 5, 11],
+        [10, 15, 4, 2, 7, 12, 9, 5, 6, 1, 13, 14, 0, 11, 3, 8],
+        [9, 14, 15, 5, 2, 8, 12, 3, 7, 0, 4, 10, 1, 13, 11, 6],
+        [4, 3, 2, 12, 9, 5, 15, 10, 11, 14, 1, 7, 6, 0, 8, 13]
+    ],
+    # S-box 7
+    [
+        [4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1],
+        [13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6],
+        [1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2],
+        [6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12]
+    ],
+    # S-box 8
+    [
+        [13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7],
+        [1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2],
+        [7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8],
+        [2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11]
+    ]
+]
+p_box_table = [
+    16, 7, 20, 21, 29, 12, 28, 17,
+    1, 15, 23, 26, 5, 18, 31, 10,
+    2, 8, 24, 14, 32, 27, 3, 9,
+    19, 13, 30, 6, 22, 11, 4, 25
+]
+ip_inverse_table = [
+    40, 8, 48, 16, 56, 24, 64, 32,
+    39, 7, 47, 15, 55, 23, 63, 31,
+    38, 6, 46, 14, 54, 22, 62, 30,
+    37, 5, 45, 13, 53, 21, 61, 29,
+    36, 4, 44, 12, 52, 20, 60, 28,
+    35, 3, 43, 11, 51, 19, 59, 27,
+    34, 2, 42, 10, 50, 18, 58, 26,
+    33, 1, 41, 9, 49, 17, 57, 25
 ]
 
-S_BOXES = [
-    # S1
-    [[14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7],
-     [0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8],
-     [4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0],
-     [15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13]],
+import string
+import random
 
-    # S2
-    [[15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10],
-     [3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5],
-     [0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15],
-     [13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9]],
+def generate_random_key():
+    key = ''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=8))
+    return key
 
-    # S3
-    [[10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8],
-     [13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1],
-     [13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7],
-     [1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12]],
-
-    # S4
-    [[7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15],
-     [13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9],
-     [10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4],
-     [3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14]],
-
-    # S5
-    [[2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9],
-     [14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6],
-     [4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14],
-     [11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3]],
-
-    # S6
-    [[12, 1, 10, 15, 9, 2, 6, 8, 0, 13, 3, 4, 14, 7, 5, 11],
-     [10, 15, 4, 2, 7, 12, 9, 5, 6, 1, 13, 14, 0, 11, 3, 8],
-     [9, 14, 15, 5, 2, 8, 12, 3, 7, 0, 4, 10, 1, 13, 11, 6],
-     [4, 3, 2, 12, 9, 5, 15, 10, 11, 14, 1, 7, 6, 0, 8, 13]],
-
-    # S7
-    [[4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1],
-     [13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6],
-     [1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2],
-     [6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12]],
-
-    # S8
-    [[13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7],
-     [1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2],
-     [7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8],
-     [2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11]]
-]
-
-def permutate(key, table):
-    """Permutasikan kunci atau blok berdasarkan tabel tertentu"""
-    return [key[i - 1] for i in table]
-
-def left_shift(bits, n):
-    """Lakukan rotasi kiri pada array bit"""
-    return bits[n:] + bits[:n]
-
-def generate_subkeys(key_64bit):
-    """Menghasilkan 16 subkunci dari kunci 64-bit"""
-    while len(key_64bit) % 64 != 0:
-        key_64bit.append(0)
-    # Permutasi pertama (PC1) menghasilkan kunci 56-bit
-    key_56bit = permutate(key_64bit, PC1)
+def str_to_bin(user_input):
+    # Convert the string to binary
+    binary_representation = ''
     
-    # Pecah kunci menjadi dua bagian 28-bit
-    C = key_56bit[:28]
-    D = key_56bit[28:]
+    for char in user_input:
+        # Get ASCII value of the character and convert it to binary
+        binary_char = format(ord(char), '08b')
+        binary_representation += binary_char
+        binary_representation = binary_representation[:64]
     
-    # List subkunci untuk 16 putaran
-    subkeys = []
+    # Pad or truncate the binary representation to 64 bits
+    binary_representation = binary_representation[:64].ljust(64, '0')
+    
+    return binary_representation
+
+def binary_to_ascii(binary_str):
+    ascii_str = ''.join([chr(int(binary_str[i:i+8], 2)) for i in range(0, len(binary_str), 8)])
+    return ascii_str
+
+def binary_to_hex(binary_str):
+    hex_str = hex(int(binary_str, 2))[2:].zfill(16)
+    return hex_str
+
+def hex_to_binary(hex_str):
+    binary_str = bin(int(hex_str, 16))[2:].zfill(64)
+    return binary_str
+
+def ip_on_binary_rep(binary_representation):
+    
+    ip_result = [None] * 64
+    
+    for i in range(64):
+        ip_result[i] = binary_representation[ip_table[i] - 1]
+
+    # Convert the result back to a string for better visualization
+    ip_result_str = ''.join(ip_result)
+    
+    return ip_result_str
+
+def key_in_binary_conv(key):
+    binary_representation_key = ''
+    
+    for char in key:
+    # Convert the characters to binary and concatenate to form a 64-bit binary string
+        binary_key = format(ord(char), '08b') 
+        binary_representation_key += binary_key
+
+    
+    return binary_representation_key
+
+def generate_round_keys(key):
+    
+    # Key into binary
+    binary_representation_key = key_in_binary_conv(key)
+    pc1_key_str = ''.join(binary_representation_key[bit - 1] for bit in pc1_table)
+
+    
+    # Split the 56-bit key into two 28-bit halves
+    c0 = pc1_key_str[:28]
+    d0 = pc1_key_str[28:]
+    round_keys = []
     for round_num in range(16):
-        # Rotasi kiri sesuai dengan tabel ROTATIONS
-        C = left_shift(C, ROTATIONS[round_num])
-        D = left_shift(D, ROTATIONS[round_num])
-        
-        # Gabungkan kembali dan permutasikan dengan PC2 untuk menghasilkan subkunci 48-bit
-        combined_key = C + D
-        subkey = permutate(combined_key, PC2)
-        
-        subkeys.append(subkey)
+        # Perform left circular shift on C and D
+        c0 = c0[shift_schedule[round_num]:] + c0[:shift_schedule[round_num]]
+        d0 = d0[shift_schedule[round_num]:] + d0[:shift_schedule[round_num]]
+        # Concatenate C and D
+        cd_concatenated = c0 + d0
+
+        # Apply the PC2 permutation
+        round_key = ''.join(cd_concatenated[bit - 1] for bit in pc2_table)
+
+        # Store the round key
+        round_keys.append(round_key)
+    return round_keys
+
+def encryption(user_input, key):
+    binary_rep_of_input = str_to_bin(user_input)
+    # Initialize lists to store round keys
+    round_keys = generate_round_keys(key)
+
+    ip_result_str = ip_on_binary_rep(binary_rep_of_input)
+
+    # the initial permutation result is devided into 2 halfs
+    lpt = ip_result_str[:32]
+    rpt = ip_result_str[32:]
+
+    # Assume 'rpt' is the 32-bit right half, 'lpt' is the 32-bit left half, and 'round_keys' is a list of 16 round keys
+
+    for round_num in range(16):
+        # Perform expansion (32 bits to 48 bits)
+        expanded_result = [rpt[i - 1] for i in e_box_table]
+
+        # Convert the result back to a string for better visualization
+        expanded_result_str = ''.join(expanded_result)
+
+        # Round key for the current round
+        round_key_str = round_keys[round_num]
+
+
+        xor_result_str = ''
+        for i in range(48):
+            xor_result_str += str(int(expanded_result_str[i]) ^ int(round_key_str[i]))
+
+
+        # Split the 48-bit string into 8 groups of 6 bits each
+        six_bit_groups = [xor_result_str[i:i+6] for i in range(0, 48, 6)]
+
+        # Initialize the substituted bits string
+        s_box_substituted = ''
+
+        # Apply S-box substitution for each 6-bit group
+        for i in range(8):
+            # Extract the row and column bits
+            row_bits = int(six_bit_groups[i][0] + six_bit_groups[i][-1], 2)
+            col_bits = int(six_bit_groups[i][1:-1], 2)
+
+            # Lookup the S-box value
+            s_box_value = s_boxes[i][row_bits][col_bits]
+            
+            # Convert the S-box value to a 4-bit binary string and append to the result
+            s_box_substituted += format(s_box_value, '04b')
+
+        # Apply a P permutation to the result
+        p_box_result = [s_box_substituted[i - 1] for i in p_box_table]
+
+        # # Convert the result back to a string for better visualization
+        # p_box_result_str = ''.join(p_box_result)
+
+
+        # Convert LPT to a list of bits for the XOR operation
+        lpt_list = list(lpt)
+
+        # Perform XOR operation
+        new_rpt = [str(int(lpt_list[i]) ^ int(p_box_result[i])) for i in range(32)]
+
+        # Convert the result back to a string for better visualization
+        new_rpt_str = ''.join(new_rpt)
+
+        # Update LPT and RPT for the next round
+        lpt = rpt
+        rpt = new_rpt_str
+
+        # Print or use the RPT for each round
+
+    # At this point, 'lpt' and 'rpt' contain the final left and right halves after 16 rounds
+
+    # After the final round, reverse the last swap
+    final_result = rpt + lpt
+
+    # Perform the final permutation (IP-1)
+    final_cipher = [final_result[ip_inverse_table[i] - 1] for i in range(64)]
+
+    # Convert the result back to a string for better visualization
+    final_cipher_str = ''.join(final_cipher)
+
+    # Print or use the final cipher(binary)
+    # print("Final Cipher binary:", final_cipher_str, len(final_cipher_str))
+
+
+    # Convert binary cipher to ascii
+    final_cipher_ascii = binary_to_ascii(final_cipher_str)
+    # print("Cipher Text (ASCII):", final_cipher_ascii)
+    final_cipher_hex = binary_to_hex(final_cipher_str)
+    # print("Cipher Text (HEX):", final_cipher_hex)
     
-    return subkeys
+    return final_cipher_hex
 
-def xor(a, b):
-    return [i ^ j for i, j in zip(a, b)]
+# decryption of cipher to origional
 
-def feistel_function(right, subkey):
-    expanded_right = permutate(right, EXPANSION_TABLE)  # Ekspansi
-    xored = xor(expanded_right, subkey)  # XOR dengan subkey
+def decryption(final_cipher_hex, key):
+    final_cipher = hex_to_binary(final_cipher_hex)
     
-    substituted = []
-    for i in range(8):
-        block = xored[i*6:(i+1)*6]
-        row = (block[0] << 1) + block[5]
-        col = (block[1] << 3) + (block[2] << 2) + (block[3] << 1) + block[4]
-        substituted += [int(b) for b in format(S_BOXES[i][row][col], '04b')]
+    # Initialize lists to store round keys
+    round_keys = generate_round_keys(key)
     
-    return permutate(substituted, P_BOX)
-
-def split_in_half(block):
-    return block[:32], block[32:]
-
-def des_round(left, right, subkey):
-    new_left = right
-    new_right = xor(left, feistel_function(right, subkey))
-    return new_left, new_right
-
-def des_encrypt(block, subkeys):
-    block = permutate(block, INITIAL_PERMUTATION)  # Permutasi awal
-    left, right = split_in_half(block)
+    # Apply Initial Permutation
+    ip_dec_result_str = ip_on_binary_rep(final_cipher)
     
-    for subkey in subkeys:  # 16 putaran Feistel
-        left, right = des_round(left, right, subkey)
+    lpt = ip_dec_result_str[:32]
+    rpt = ip_dec_result_str[32:]
+
+    for round_num in range(16):
+        # Perform expansion (32 bits to 48 bits)
+        expanded_result = [rpt[i - 1] for i in e_box_table]
     
-    combined_block = right + left  # Gabungkan kembali L dan R
-    return permutate(combined_block, FINAL_PERMUTATION)  # Permutasi akhir
-
-def des_decrypt(block, subkeys):
-    block = permutate(block, INITIAL_PERMUTATION)
-    left, right = split_in_half(block)
+        # Convert the result back to a string for better visualization
+        expanded_result_str = ''.join(expanded_result)
+        # print(expanded_result_str)
+        # Round key for the current round
+        round_key_str = round_keys[15-round_num]
     
-    for subkey in reversed(subkeys):  # Urutkan subkunci terbalik
-        left, right = des_round(left, right, subkey)
+        # XOR between key and expanded result 
+        xor_result_str = ''
+        for i in range(48):
+            xor_result_str += str(int(expanded_result_str[i]) ^ int(round_key_str[i]))
     
-    combined_block = right + left
-    return permutate(combined_block, FINAL_PERMUTATION)
-
-def string_to_bit_array(text):
-    result = []
-    for char in text:
-        # Mengambil nilai ASCII dari karakter, lalu mengonversinya menjadi representasi biner 8-bit
-        bin_val = bin(ord(char))[2:].zfill(8)  # ord() mengubah karakter ke ASCII, bin() menjadi biner
-        result.extend([int(bit) for bit in bin_val])  # Pisahkan setiap bit dan tambahkan ke array
-    return result
-
-def bit_array_to_string(bit_array):
-    chars = []
-    for b in range(0, len(bit_array), 8):
-        byte = bit_array[b:b+8]  # Ambil setiap 8 bit (1 byte)
-        byte_str = ''.join([str(bit) for bit in byte])  # Gabungkan bit jadi string
-        chars.append(chr(int(byte_str, 2)))  # Konversi dari biner ke karakter ASCII
-    return ''.join(chars)
-
-def des_encrypt_text(plain_text, subkeys):
-    bit_array = string_to_bit_array(plain_text)
     
-    # Tambahkan padding jika teks bukan kelipatan 64 bit (8 byte)
-    while len(bit_array) % 64 != 0:
-        bit_array.append(0)  # Tambahkan padding berupa bit 0
+        # Split the 48-bit string into 8 groups of 6 bits each
+        six_bit_groups = [xor_result_str[i:i+6] for i in range(0, 48, 6)]
+    
+        # Initialize the substituted bits string
+        s_box_substituted = ''
+    
+        # Apply S-box substitution for each 6-bit group
+        for i in range(8):
+            # Extract the row and column bits
+            row_bits = int(six_bit_groups[i][0] + six_bit_groups[i][-1], 2)
+            col_bits = int(six_bit_groups[i][1:-1], 2)
+    
+            # Lookup the S-box value
+            s_box_value = s_boxes[i][row_bits][col_bits]
+            
+            # Convert the S-box value to a 4-bit binary string and append to the result
+            s_box_substituted += format(s_box_value, '04b')
+    
+        # Apply a P permutation to the result
+        p_box_result = [s_box_substituted[i - 1] for i in p_box_table]
+    
+        # Convert the result back to a string for better visualization
+        # p_box_result_str = ''.join(p_box_result)
+    
+        # Convert LPT to a list of bits for the XOR operation
+        lpt_list = list(lpt)
+    
+        # Perform XOR operation
+        new_rpt = [str(int(lpt_list[i]) ^ int(p_box_result[i])) for i in range(32)]
+    
+        # Convert the result back to a string for better visualization
+        new_rpt_str = ''.join(new_rpt)
+    
+        # Update LPT and RPT for the next round
+        lpt = rpt
+        rpt = new_rpt_str
+    
+        # Print or use the RPT for each round
+    
+    final_result = rpt + lpt
+    # Perform the final permutation (IP-1)
+    final_cipher = [final_result[ip_inverse_table[i] - 1] for i in range(64)]
 
-    cipher_text = []
-    for i in range(0, len(bit_array), 64):
-        block = bit_array[i:i+64]
-        cipher_block = des_encrypt(block, subkeys)
-        cipher_text.extend(cipher_block)
+    # Convert the result back to a string for better visualization
+    final_cipher_str = ''.join(final_cipher)
 
-    return cipher_text
+    # Print or use the final cipher
 
-def des_decrypt_text(cipher_text, subkeys):
-    plain_text_bits = []
+    # binary cipher string to ascii
+    final_cipher_ascii = binary_to_ascii(final_cipher_str)
+    # print("Decryption of Cipher (ASCII):", final_cipher_ascii)
 
-    for i in range(0, len(cipher_text), 64):
-        block = cipher_text[i:i+64]
-        plain_block = des_decrypt(block, subkeys)
-        plain_text_bits.extend(plain_block)
+    return final_cipher_ascii
 
-    plain_text = bit_array_to_string(plain_text_bits)
-    return plain_text
+def pad_input(user_input):
+    while len(user_input) % 8 != 0:
+        user_input += ' '
+    return user_input
 
-encrypted_texts = []
-key = None
-subkeys = None
+def encryption_large_text(user_input, key):
+    user_input = pad_input(user_input)
+    encrypted_text = ""
+    for i in range(0, len(user_input), 8):
+        block = user_input[i:i+8]
+        encrypted_block = encryption(block, key)
+        encrypted_text += encrypted_block
+    return encrypted_text
 
-while True:
-    print("\n==== MENU ====")
-    print("1. Generate new key")
-    print("2. Encrypt text")
-    print("3. Decrypt all text")
-    print("4. Exit")
-
-    choice = input("Enter menu number: ")
-
-    if choice == "1":
-        # Generate new key
-        key = input("Enter new key: ")
-        while len(key) > 8:
-            print("Key must not longer than 8 characters, please try again.")
-            key = input("Enter new key: ")
-        key = string_to_bit_array(key)
-        subkeys = generate_subkeys(key)
-        # print("New key generated:", key)
-        print("New key generated")
-
-    elif choice == "2":
-        if key is None:
-            print("Please generate a key first (Menu 1).")
-        else:
-            # Encrypt text
-            plain_text = input("Enter text to encrypt: ")
-            encrypted = des_encrypt_text(plain_text, subkeys)
-            encrypted_texts.append(encrypted)
-            print("Text has been encrypted and stored.")
-
-    elif choice == "3":
-        if not encrypted_texts:
-            print("No encrypted texts found.")
-        else:
-            # Decrypt all texts
-            print("Decrypting all texts...")
-            for idx, encrypted in enumerate(encrypted_texts):
-                decrypted = des_decrypt_text(encrypted, subkeys)
-                print(f"Decrypted text {idx + 1}: {decrypted}")
-
-    elif choice == "4":
-        print("Exiting program.")
-        break
-
-    else:
-        print("Invalid choice, please select a valid option.")
+def decryption_large_text(encrypted_text, key):
+    decrypted_text = ""
+    for i in range(0, len(encrypted_text), 16):
+        block = encrypted_text[i:i+16]
+        decrypted_block = decryption(block, key)
+        decrypted_text += decrypted_block
+    return decrypted_text.strip()

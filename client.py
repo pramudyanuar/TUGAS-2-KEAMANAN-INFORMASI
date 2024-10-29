@@ -1,66 +1,65 @@
 import socket
 import threading
-import tkinter as tk
-from tkinter import scrolledtext
+from des import encryption_large_text, decryption_large_text
 
-def receive_messages(client_socket, text_area, label):
-    client_id = None
+# Variabel untuk menyimpan shared key
+shared_key = None
+
+def send_message(client_socket):
+    global shared_key
     while True:
         try:
-            message = client_socket.recv(1024).decode('utf-8')
-            if message:
-                if message.startswith("Your shared key:"):
-                    text_area.config(state='normal')
-                    text_area.insert(tk.END, message + '\n')
-                    text_area.config(state='disabled')
-                elif message.startswith("You are Client"):
-                    client_id = message.split()[-1]
-                    label.config(text=f"You are Client {client_id}")
-                else:
-                    text_area.config(state='normal')
-                    text_area.insert(tk.END, message + '\n')
-                    text_area.config(state='disabled')
-                    text_area.yview(tk.END)
-            else:
-                break
-        except:
+            # Tunggu hingga shared_key diterima
+            if shared_key is None:
+                continue
+            
+            inp = input("")
+            message = encryption_large_text(inp, shared_key)
+            client_socket.sendall(message.encode('utf-8'))
+        except Exception as e:
+            print(f"Error: {e}")
+            client_socket.close()
             break
 
-def send_message(event=None):
-    message = message_entry.get()
-    if message:
-        text_area.config(state='normal')
-        text_area.insert(tk.END, f"You: {message}\n")
-        text_area.config(state='disabled')
-        text_area.yview(tk.END)
-        
-        client_socket.sendall(message.encode('utf-8'))
-        
-        message_entry.delete(0, tk.END)
+def receive_message(client_socket):
+    global shared_key
+    while True:
+        try:
+            receive = client_socket.recv(1024).decode('utf-8')
+            if receive:
+                if "Your shared key:" in receive:
+                    # Mengambil shared key dari pesan server
+                    shared_key = receive.split(": ")[1].strip()
+                    print(f"Received shared key: {shared_key}")
+                else:
+                    # Memisahkan username dan pesan terenkripsi
+                    if ": " in receive:
+                        sender, encrypted_message = receive.split(": ", 1)
+                        message = decryption_large_text(encrypted_message, shared_key)
+                        print(f"{sender}: {message}")
+                    else:
+                        print("Format pesan tidak dikenal:", receive)
+            else:
+                break
+        except Exception as e:
+            print(f"Error receiving message: {e}")
+            break
+
 
 def client_program():
-    global client_socket, message_entry, text_area
-    
+    username = input("Enter your username: ")  # Minta username dari pengguna
+
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect(('127.0.0.1', 12345))
 
-    window = tk.Tk()
-    window.title("Chat Client")
+    # Kirim username ke server
+    client_socket.sendall(f"USERNAME:{username}".encode('utf-8'))
 
-    client_label = tk.Label(window, text="Connecting...")
-    client_label.pack()
+    # Mulai thread untuk menerima pesan dari server
+    threading.Thread(target=receive_message, args=(client_socket,)).start()
+    # Mulai thread untuk mengirim pesan ke server
+    threading.Thread(target=send_message, args=(client_socket,)).start()
 
-    text_area = scrolledtext.ScrolledText(window, wrap=tk.WORD, state='disabled', width=50, height=20)
-    text_area.pack(padx=10, pady=10)
-
-    message_entry = tk.Entry(window, width=50)
-    message_entry.pack(padx=10, pady=10)
-    message_entry.bind("<Return>", send_message)
-
-    threading.Thread(target=receive_messages, args=(client_socket, text_area, client_label), daemon=True).start()
-
-    window.protocol("WM_DELETE_WINDOW", lambda: (client_socket.close(), window.destroy()))
-    window.mainloop()
-
+# Menjalankan client
 if __name__ == "__main__":
     client_program()
