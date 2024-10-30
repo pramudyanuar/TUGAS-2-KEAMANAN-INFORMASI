@@ -13,49 +13,43 @@ Proyek ini adalah bagian dari *Tugas 2 Keamanan Informasi B*, yang bertujuan unt
 
 ### Prasyarat
 - Python 3.x
-- Library `pycryptodome`
 
 ### Instalasi
-1. Install library yang diperlukan:
+1. Clone repository:
    ```bash
-   pip install pycryptodome
+   git clone https://github.com/pramudyanuar/TUGAS-2-KEAMANAN-INFORMASI.git
+   cd TUGAS-2-KEAMANAN-INFORMASI
    ```
 
-2. Clone repository:
+2. Jalankan **server.py**:
    ```bash
-   git clone https://github.com/username/repo-enkripsi-des.git
-   cd repo-enkripsi-des
+   py server.py
    ```
 
-3. Jalankan **server.py**:
+3. Jalankan 2 **client.py** pada terminal terpisah untuk mengirim pesan terenkripsi:
    ```bash
-   python server.py
-   ```
-
-4. Jalankan **client.py** untuk mengirim pesan terenkripsi:
-   ```bash
-   python client.py
+   py client.py
    ```
 
 ## Struktur Proyek
-- **client.py**: Mengirim pesan terenkripsi ke server melalui socket.
-- **server.py**: Menerima pesan terenkripsi dan mendekripsinya.
+- **client.py**: Mengirim pesan terenkripsi ke server melalui socket dan mendekripsi pesan yang diterima.
+- **server.py**: Menghubungkan 2 client dan perantara pesan client.
 - **encryption.py**: Modul berisi fungsi enkripsi dan dekripsi DES.
 
 ## 📋 Pembagian Kerja
 
 | **Anggota**           | **Tugas Utama**                                                                                      |
 |-----------------------|-----------------------------------------------------------------------------------------------------|
-| **Yanuar Eka Pramudya**     | 🔑 **Pengembangan Logika Enkripsi & Dekripsi DES**<br>• Mengembangkan algoritma DES untuk enkripsi dan dekripsi.<br>• Menambahkan padding untuk blok yang tidak memenuhi 64-bit.<br>• Membuat unit test untuk memverifikasi hasil enkripsi dan dekripsi. |
-| **Abiyu Ramadhan Kiesly**     | 💻 **Pengembangan Socket Programming**<br>• Menerapkan komunikasi antara client dan server menggunakan socket programming.<br>• Mengintegrasikan modul enkripsi ke dalam client dan server.<br>• Menulis dokumentasi lengkap proyek serta README.|
+| **Abiyu Ramadhan Kiesly**     | 🔑 **Pengembangan Logika Enkripsi & Dekripsi DES**<br>• Mengembangkan algoritma DES untuk enkripsi dan dekripsi.<br>• Menambahkan padding untuk blok yang tidak memenuhi 64-bit.<br>• Membuat unit test untuk memverifikasi hasil enkripsi dan dekripsi. |
+| **Yanuar Eka Pramudya**     | 💻 **Pengembangan Socket Programming**<br>• Menerapkan komunikasi antara client dan server menggunakan socket programming.<br>• Mengintegrasikan modul enkripsi ke dalam client dan server.<br>• Menulis dokumentasi lengkap proyek serta README.|
 
 ### 📌 Detail Tugas
 
-#### 🎯 **Yanuar Eka Pramudya (5025221049)**: 
+#### 🎯 **Abiyu Ramadhan Kiesly (5025221123)**: 
 - **Pengembangan Enkripsi & Dekripsi**: Mengimplementasikan logika DES dengan memperhatikan kebutuhan pemecahan pesan lebih dari 64-bit.
 - **Unit Testing**: Membuat dan menjalankan pengujian untuk memastikan enkripsi dan dekripsi berfungsi dengan benar.
 
-#### 🎯 **Abiyu Ramadhan Kiesly (5025221123 )**:
+#### 🎯 **Yanuar Eka Pramudya (5025221049)**:
 - **Socket Programming**: Mengembangkan koneksi antara client dan server menggunakan socket, dan memastikan data yang dikirim aman.
 - **Dokumentasi & README**: Menulis dokumentasi proyek, termasuk panduan penggunaan, dan penjelasan pembagian kerja.
 
