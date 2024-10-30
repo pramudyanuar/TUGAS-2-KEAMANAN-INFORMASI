@@ -2,7 +2,7 @@ import socket
 import threading
 from tkinter import *
 from tkinter import scrolledtext, messagebox
-from des import encryption_large_text, decryption_large_text
+from des.des import encryption_text, decryption_text
 
 # Variabel untuk menyimpan shared key dan username
 shared_key = None
@@ -40,7 +40,7 @@ def send_message():
     
     message = message_entry.get()
     if message:
-        encrypted_message = encryption_large_text(message, shared_key)
+        encrypted_message = encryption_text(message, shared_key)
         client_socket.sendall(encrypted_message.encode('utf-8'))
         chat_display.insert(END, f"You: {message}\n")
         message_entry.delete(0, END)
@@ -59,7 +59,7 @@ def receive_message():
                     # Memisahkan username dan pesan terenkripsi
                     if ": " in receive:
                         sender, encrypted_message = receive.split(": ", 1)
-                        message = decryption_large_text(encrypted_message, shared_key)
+                        message = decryption_text(encrypted_message, shared_key)
                         chat_display.insert(END, f"{sender}: {message}\n")
                     else:
                         chat_display.insert(END, f"Unknown message format: {receive}\n")
